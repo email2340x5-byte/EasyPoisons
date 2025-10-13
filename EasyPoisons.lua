@@ -59,7 +59,7 @@ local POISONS = {
         icon = "Interface\\Icons\\spell_nature_nullifydisease",
         materials = {
             {itemID = 8924, name = "Dust of Deterioration", amount = 2},
-            {itemID = 8923, name = "Essence of Agony", amount = 1},
+            {itemID = 8923, name = "Essence of Agony", amount = 2},
             {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5}
         }
     }
