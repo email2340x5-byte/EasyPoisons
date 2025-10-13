@@ -11,9 +11,9 @@ local POISONS = {
         itemID = 54010,
         icon = "Interface\\Icons\\spell_nature_slowpoison",
         materials = {
-            {itemID = 8924, name = "Dust of Deterioration", amount = 3},
-            {itemID = 2931, name = "Maiden's Anguish", amount = 4},
-            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5}
+            {itemID = 8924, name = "Dust of Deterioration", amount = 3, stackSize = 1, maxStack = 20},
+            {itemID = 2931, name = "Maiden's Anguish", amount = 4, stackSize = 1, maxStack = 10},
+            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5, maxStack = 20}
         }
     },
     {
@@ -21,8 +21,8 @@ local POISONS = {
         itemID = 3776,
         icon = "Interface\\Icons\\inv_potion_19",
         materials = {
-            {itemID = 8923, name = "Essence of Agony", amount = 3},
-            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5}
+            {itemID = 8923, name = "Essence of Agony", amount = 3, stackSize = 1, maxStack = 20},
+            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5, maxStack = 20}
         }
     },
     {
@@ -30,8 +30,8 @@ local POISONS = {
         itemID = 8928,
         icon = "Interface\\Icons\\ability_poisons",
         materials = {
-            {itemID = 8924, name = "Dust of Deterioration", amount = 4},
-            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5}
+            {itemID = 8924, name = "Dust of Deterioration", amount = 4, stackSize = 1, maxStack = 20},
+            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5, maxStack = 20}
         }
     },
     {
@@ -39,9 +39,9 @@ local POISONS = {
         itemID = 47409,
         icon = "Interface\\Icons\\inv_corrosive_01",
         materials = {
-            {itemID = 8924, name = "Dust of Deterioration", amount = 3},
-            {itemID = 5173, name = "Deathweed", amount = 3},
-            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5}
+            {itemID = 8924, name = "Dust of Deterioration", amount = 3, stackSize = 1, maxStack = 20},
+            {itemID = 5173, name = "Deathweed", amount = 3, stackSize = 1, maxStack = 20},
+            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5, maxStack = 20}
         }
     },
     {
@@ -49,8 +49,8 @@ local POISONS = {
         itemID = 20844,
         icon = "Interface\\Icons\\ability_rogue_dualweild",
         materials = {
-            {itemID = 5173, name = "Deathweed", amount = 7},
-            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5}
+            {itemID = 5173, name = "Deathweed", amount = 7, stackSize = 1, maxStack = 20},
+            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5, maxStack = 20}
         }
     },
     {
@@ -58,9 +58,9 @@ local POISONS = {
         itemID = 9186,
         icon = "Interface\\Icons\\spell_nature_nullifydisease",
         materials = {
-            {itemID = 8924, name = "Dust of Deterioration", amount = 2},
-            {itemID = 8923, name = "Essence of Agony", amount = 2},
-            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5}
+            {itemID = 8924, name = "Dust of Deterioration", amount = 2, stackSize = 1, maxStack = 20},
+            {itemID = 8923, name = "Essence of Agony", amount = 2, stackSize = 1, maxStack = 20},
+            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5, maxStack = 20}
         }
     }
 }
@@ -120,12 +120,17 @@ function EasyPoisons:CalculateTotalCost()
         end
     end
 
-    -- Now calculate cost based on total materials needed
+    -- Now calculate cost based on total materials needed, minus what we already have
     for itemID, data in materialTotals do
-        local stacksToBuy = math.ceil(data.total / data.stackSize)
-        local price = EasyPoisons:GetItemPrice(itemID)
-        -- Price is per stack, so multiply by number of stacks
-        totalCost = totalCost + (price * stacksToBuy)
+        local inBags = EasyPoisons:GetMaterialCount(itemID)
+        local stillNeeded = math.max(0, data.total - inBags)
+
+        if stillNeeded > 0 then
+            local stacksToBuy = math.ceil(stillNeeded / data.stackSize)
+            local price = EasyPoisons:GetItemPrice(itemID)
+            -- Price is per stack, so multiply by number of stacks
+            totalCost = totalCost + (price * stacksToBuy)
+        end
     end
 
     return totalCost
@@ -152,12 +157,129 @@ function EasyPoisons:FormatMoney(copper)
     return text
 end
 
+-- Count materials already in player bags
+function EasyPoisons:GetMaterialCount(itemID)
+    local count = 0
+
+    -- Iterate through all bags (0-4, where 0 is backpack)
+    for bag = 0, 4 do
+        local numSlots = GetContainerNumSlots(bag)
+        if numSlots and numSlots > 0 then
+            for slot = 1, numSlots do
+                local itemLink = GetContainerItemLink(bag, slot)
+                if itemLink then
+                    local _, _, itemString = string.find(itemLink, "item:(%d+)")
+                    if itemString and tonumber(itemString) == itemID then
+                        local _, itemCount = GetContainerItemInfo(bag, slot)
+                        if itemCount then
+                            count = count + itemCount
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return count
+end
+
+-- Count available bag slots
+function EasyPoisons:GetAvailableBagSlots()
+    local freeSlots = 0
+
+    -- Iterate through all bags (0-4, where 0 is backpack)
+    for bag = 0, 4 do
+        local numSlots = GetContainerNumSlots(bag)
+        if numSlots and numSlots > 0 then
+            for slot = 1, numSlots do
+                local itemLink = GetContainerItemLink(bag, slot)
+                if not itemLink then
+                    freeSlots = freeSlots + 1
+                end
+            end
+        end
+    end
+
+    return freeSlots
+end
+
+-- Calculate required bag slots for purchase
+function EasyPoisons:CalculateRequiredBagSlots()
+    local materialTotals = {}
+
+    -- Calculate total materials needed across all poisons
+    for i = 1, table.getn(POISONS) do
+        local poison = POISONS[i]
+        local qty = quantities[i] or 0
+
+        if qty > 0 then
+            for j = 1, table.getn(poison.materials) do
+                local mat = poison.materials[j]
+                local neededAmount = mat.amount * qty
+
+                if not materialTotals[mat.itemID] then
+                    materialTotals[mat.itemID] = {
+                        total = 0,
+                        stackSize = mat.stackSize or 1,
+                        maxStack = mat.maxStack or 1
+                    }
+                end
+                materialTotals[mat.itemID].total = materialTotals[mat.itemID].total + neededAmount
+            end
+        end
+    end
+
+    -- Calculate how many bag slots will be needed for the purchase
+    local requiredSlots = 0
+    for itemID, data in materialTotals do
+        local inBags = EasyPoisons:GetMaterialCount(itemID)
+        local stillNeeded = math.max(0, data.total - inBags)
+
+        if stillNeeded > 0 then
+            -- Calculate how many items we'll actually buy (rounded up to vendor stacks)
+            local stacksToBuy = math.ceil(stillNeeded / data.stackSize)
+            local totalItemsToBuy = stacksToBuy * data.stackSize
+
+            -- Calculate how many bag slots those items will occupy
+            local slotsNeeded = math.ceil(totalItemsToBuy / data.maxStack)
+            requiredSlots = requiredSlots + slotsNeeded
+        end
+    end
+
+    return requiredSlots
+end
+
+-- Validate bag space and update buy button
+function EasyPoisons:ValidateBagSpace()
+    if not mainFrame or not mainFrame.buyButton or not mainFrame.bagWarningText then return end
+
+    local requiredSlots = EasyPoisons:CalculateRequiredBagSlots()
+    local availableSlots = EasyPoisons:GetAvailableBagSlots()
+
+    if requiredSlots > availableSlots then
+        -- Not enough bag space - disable button
+        mainFrame.buyButton:Disable()
+        mainFrame.buyButton:SetBackdropColor(0.3, 0.3, 0.3, 0.6)
+        mainFrame.buyButton:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+        mainFrame.bagWarningText:SetText("Not enough bag space!")
+    else
+        -- Enough bag space - enable button
+        mainFrame.buyButton:Enable()
+        mainFrame.buyButton:SetBackdropColor(0.2, 0.7, 0.2, 0.9)
+        mainFrame.buyButton:SetBackdropBorderColor(0.2, 0.8, 0.2, 1)
+        mainFrame.bagWarningText:SetText("")
+    end
+end
+
 -- Update cost display
 function EasyPoisons:UpdateCostDisplay()
     if not mainFrame or not mainFrame.costText then return end
 
     local cost = EasyPoisons:CalculateTotalCost()
     mainFrame.costText:SetText(EasyPoisons:FormatMoney(cost))
+
+    -- Also validate bag space when cost is updated
+    EasyPoisons:ValidateBagSpace()
 end
 
 -- Create input box
@@ -351,7 +473,7 @@ function EasyPoisons:CreateMainFrame()
     -- Title
     local title = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     title:SetPoint("TOP", mainFrame, "TOP", 0, -8)
-    title:SetText("|cFF00FF00EasyPoisons|r |cFFAAAAAA v" .. addonVersion .. "|r")
+    title:SetText("|cFF00FF00Easy Poisons|r |cFFAAAAAA v" .. addonVersion .. "|r")
     title:SetTextColor(1, 1, 1, 1)
 
     -- Author
@@ -469,6 +591,15 @@ function EasyPoisons:CreateMainFrame()
         EasyPoisons:BuyMaterials()
     end)
 
+    mainFrame.buyButton = buyButton
+
+    -- Bag space warning text (below buy button)
+    local bagWarningText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    bagWarningText:SetPoint("TOP", buyButton, "BOTTOM", 0, -2)
+    bagWarningText:SetText("")
+    bagWarningText:SetTextColor(1, 0.2, 0.2, 1)
+    mainFrame.bagWarningText = bagWarningText
+
     -- Cost display
     local costLabel = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     costLabel:SetPoint("BOTTOM", mainFrame, "BOTTOM", -40, 8)
@@ -499,7 +630,7 @@ function EasyPoisons:BuyMaterials()
     local playerMoney = GetMoney()
 
     if totalCost > playerMoney then
-        DEFAULT_CHAT_FRAME:AddMessage("|cFFFF0000EasyPoisons: Not enough money!|r")
+        DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00EasyPoisons:|r |cFFFFFFFFNot enough money!|r")
         return
     end
 
@@ -528,16 +659,27 @@ function EasyPoisons:BuyMaterials()
         end
     end
 
-    -- Build purchase list with optimized stack counts
+    -- Build purchase list with optimized stack counts, accounting for existing materials
     local purchaseList = {}
     for itemID, data in materialTotals do
-        local stacksToBuy = math.ceil(data.total / data.stackSize)
-        table.insert(purchaseList, {
-            itemID = itemID,
-            name = data.name,
-            stacks = stacksToBuy,
-            stackSize = data.stackSize
-        })
+        local inBags = EasyPoisons:GetMaterialCount(itemID)
+        local stillNeeded = math.max(0, data.total - inBags)
+
+        if stillNeeded > 0 then
+            local stacksToBuy = math.ceil(stillNeeded / data.stackSize)
+            table.insert(purchaseList, {
+                itemID = itemID,
+                name = data.name,
+                stacks = stacksToBuy,
+                stackSize = data.stackSize
+            })
+        end
+    end
+
+    -- Check if we actually need to buy anything
+    if table.getn(purchaseList) == 0 then
+        DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00EasyPoisons:|r |cFFFFFFFFYou already have all the materials!|r")
+        return
     end
 
     -- Purchase items
@@ -554,14 +696,14 @@ function EasyPoisons:BuyMaterials()
                     -- Buy the item
                     local maxStack = GetMerchantItemMaxStack(j)
                     BuyMerchantItem(j, item.stacks)
-                    DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00EasyPoisons: Purchased " .. (item.stacks * item.stackSize) .. "x " .. item.name .. "|r")
+                    DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00EasyPoisons:|r |cFFFFFFFFPurchased " .. (item.stacks * item.stackSize) .. "x " .. item.name .. "|r")
                     break
                 end
             end
         end
     end
 
-    DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00EasyPoisons: Purchase complete!|r")
+    DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00EasyPoisons:|r |cFFFFFFFFPurchase complete!|r")
 end
 
 -- Check if vendor sells poison materials
@@ -600,7 +742,7 @@ eventFrame:RegisterEvent("MERCHANT_CLOSED")
 eventFrame:SetScript("OnEvent", function()
     if event == "ADDON_LOADED" and arg1 == "EasyPoisons" then
         EasyPoisons:Initialize()
-        DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00EasyPoisons loaded! Type /easypoisons to toggle window.|r")
+        DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00EasyPoisons:|r |cFFFFFFFFLoaded! Type /easypoisons to toggle window.|r")
     elseif event == "MERCHANT_SHOW" then
         if EasyPoisons:IsVendorPoisonVendor() then
             if not mainFrame then
