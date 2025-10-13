@@ -510,6 +510,7 @@ function EasyPoisons:CreateMainFrame()
     end)
     closeButton:SetScript("OnClick", function()
         mainFrame:Hide()
+        EasyPoisons:ResetQuantities()
     end)
 
     -- Content area
@@ -756,6 +757,7 @@ eventFrame:SetScript("OnEvent", function()
     elseif event == "MERCHANT_CLOSED" then
         if mainFrame and mainFrame:IsVisible() then
             mainFrame:Hide()
+            EasyPoisons:ResetQuantities()
         end
     end
 end)
