@@ -96,7 +96,9 @@ end
 -- Calculate total cost
 function EasyPoisons:CalculateTotalCost()
     local totalCost = 0
+    local materialTotals = {}
 
+    -- First, calculate total materials needed across all poisons
     for i = 1, table.getn(POISONS) do
         local poison = POISONS[i]
         local qty = quantities[i] or 0
@@ -106,15 +108,24 @@ function EasyPoisons:CalculateTotalCost()
                 local mat = poison.materials[j]
                 local neededAmount = mat.amount * qty
 
-                -- Calculate how many to buy (accounting for stack sizes)
-                local stackSize = mat.stackSize or 1
-                local stacksToBuy = math.ceil(neededAmount / stackSize)
-
-                local price = EasyPoisons:GetItemPrice(mat.itemID)
-                -- Price is per stack, so multiply by number of stacks
-                totalCost = totalCost + (price * stacksToBuy)
+                -- Add to material totals
+                if not materialTotals[mat.itemID] then
+                    materialTotals[mat.itemID] = {
+                        total = 0,
+                        stackSize = mat.stackSize or 1
+                    }
+                end
+                materialTotals[mat.itemID].total = materialTotals[mat.itemID].total + neededAmount
             end
         end
+    end
+
+    -- Now calculate cost based on total materials needed
+    for itemID, data in materialTotals do
+        local stacksToBuy = math.ceil(data.total / data.stackSize)
+        local price = EasyPoisons:GetItemPrice(itemID)
+        -- Price is per stack, so multiply by number of stacks
+        totalCost = totalCost + (price * stacksToBuy)
     end
 
     return totalCost
@@ -492,9 +503,9 @@ function EasyPoisons:BuyMaterials()
         return
     end
 
-    local purchaseList = {}
+    local materialTotals = {}
 
-    -- Build purchase list
+    -- Build material totals across all poisons
     for i = 1, table.getn(POISONS) do
         local poison = POISONS[i]
         local qty = quantities[i] or 0
@@ -504,30 +515,29 @@ function EasyPoisons:BuyMaterials()
                 local mat = poison.materials[j]
                 local neededAmount = mat.amount * qty
 
-                -- Calculate how many to buy (accounting for stack sizes)
-                local stackSize = mat.stackSize or 1
-                local stacksToBuy = math.ceil(neededAmount / stackSize)
-
-                -- Check if already in purchase list
-                local found = false
-                for k = 1, table.getn(purchaseList) do
-                    if purchaseList[k].itemID == mat.itemID then
-                        purchaseList[k].stacks = purchaseList[k].stacks + stacksToBuy
-                        found = true
-                        break
-                    end
-                end
-
-                if not found then
-                    table.insert(purchaseList, {
-                        itemID = mat.itemID,
+                -- Add to material totals
+                if not materialTotals[mat.itemID] then
+                    materialTotals[mat.itemID] = {
                         name = mat.name,
-                        stacks = stacksToBuy,
-                        stackSize = stackSize
-                    })
+                        total = 0,
+                        stackSize = mat.stackSize or 1
+                    }
                 end
+                materialTotals[mat.itemID].total = materialTotals[mat.itemID].total + neededAmount
             end
         end
+    end
+
+    -- Build purchase list with optimized stack counts
+    local purchaseList = {}
+    for itemID, data in materialTotals do
+        local stacksToBuy = math.ceil(data.total / data.stackSize)
+        table.insert(purchaseList, {
+            itemID = itemID,
+            name = data.name,
+            stacks = stacksToBuy,
+            stackSize = data.stackSize
+        })
     end
 
     -- Purchase items

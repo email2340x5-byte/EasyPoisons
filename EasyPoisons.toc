@@ -2,7 +2,7 @@
 ## Title: |cff00ff00Easy Poisons|r |cff808080[Horyoshi]|r
 ## Notes: Easily purchase poison materials from vendors. Opens automatically when visiting poison material vendors.
 ## Author: Horyoshi
-## Version: 1.1
+## Version: 1.2
 ## SavedVariables: EasyPoisonsDB
 
 EasyPoisons.lua
