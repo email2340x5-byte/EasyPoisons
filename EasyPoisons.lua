@@ -273,10 +273,11 @@ end
 
 -- Update cost display
 function EasyPoisons:UpdateCostDisplay()
-    if not mainFrame or not mainFrame.costText then return end
+    if not mainFrame or not mainFrame.costLabel then return end
 
     local cost = EasyPoisons:CalculateTotalCost()
-    mainFrame.costText:SetText(EasyPoisons:FormatMoney(cost))
+    local formattedCost = EasyPoisons:FormatMoney(cost)
+    mainFrame.costLabel:SetText("Total Cost: " .. formattedCost)
 
     -- Also validate bag space when cost is updated
     EasyPoisons:ValidateBagSpace()
@@ -362,7 +363,7 @@ function EasyPoisons:CreatePoisonRow(parent, index)
     local minusButton = CreateFrame("Button", nil, frame)
     minusButton:SetWidth(14)
     minusButton:SetHeight(14)
-    minusButton:SetPoint("RIGHT", frame, "RIGHT", -75, 0)
+    minusButton:SetPoint("RIGHT", frame, "RIGHT", -64, 0)
     minusButton:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -393,7 +394,7 @@ function EasyPoisons:CreatePoisonRow(parent, index)
 
     -- Input box
     local input = EasyPoisons:CreateInputBox(frame, 40)
-    input:SetPoint("RIGHT", frame, "RIGHT", -32, 0)
+    input:SetPoint("RIGHT", frame, "RIGHT", -21, 0)
     input:SetText("0")
     frame.input = input
 
@@ -600,17 +601,18 @@ function EasyPoisons:CreateMainFrame()
     bagWarningText:SetTextColor(1, 0.2, 0.2, 1)
     mainFrame.bagWarningText = bagWarningText
 
-    -- Cost display
-    local costLabel = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    costLabel:SetPoint("BOTTOM", mainFrame, "BOTTOM", -40, 8)
-    costLabel:SetText("Total Cost:")
-    costLabel:SetTextColor(0.7, 0.7, 0.7, 1)
+    -- Cost display container
+    local costContainer = CreateFrame("Frame", nil, mainFrame)
+    costContainer:SetWidth(200)
+    costContainer:SetHeight(20)
+    costContainer:SetPoint("BOTTOM", mainFrame, "BOTTOM", 0, 8)
+    mainFrame.costContainer = costContainer
 
-    local costText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    costText:SetPoint("LEFT", costLabel, "RIGHT", 5, 0)
-    costText:SetText(EasyPoisons:FormatMoney(0))
-    costText:SetTextColor(1, 0.85, 0, 1)
-    mainFrame.costText = costText
+    local costLabel = costContainer:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    costLabel:SetPoint("CENTER", costContainer, "CENTER", 0, 0)
+    costLabel:SetText("Total Cost: " .. EasyPoisons:FormatMoney(0))
+    costLabel:SetTextColor(0.7, 0.7, 0.7, 1)
+    mainFrame.costLabel = costLabel
 end
 
 -- Reset all quantities
