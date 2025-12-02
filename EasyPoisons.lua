@@ -17,6 +17,26 @@ local POISONS = {
         }
     },
     {
+        name = "Dissolvent Poison I",
+        itemID = 54010,
+        icon = "Interface\\Icons\\spell_nature_slowpoison",
+        materials = {
+            {itemID = 8924, name = "Dust of Deterioration", amount = 2, stackSize = 1, maxStack = 20},
+            {itemID = 2931, name = "Maiden's Anguish", amount = 3, stackSize = 1, maxStack = 10},
+            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5, maxStack = 20}
+        }
+    },
+    {
+        name = "Corrosive Poison II & I",
+        itemID = 47409,
+        icon = "Interface\\Icons\\inv_corrosive_01",
+        materials = {
+            {itemID = 8924, name = "Dust of Deterioration", amount = 3, stackSize = 1, maxStack = 20},
+            {itemID = 5173, name = "Deathweed", amount = 3, stackSize = 1, maxStack = 20},
+            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5, maxStack = 20}
+        }
+    },
+    {
         name = "Crippling Poison II",
         itemID = 3776,
         icon = "Interface\\Icons\\inv_potion_19",
@@ -26,7 +46,16 @@ local POISONS = {
         }
     },
     {
-        name = "Instant Poison IV",
+        name = "Crippling Poison I",
+        itemID = 3775,
+        icon = "Interface\\Icons\\inv_potion_19",
+        materials = {
+            {itemID = 2930, name = "Essence of Pain", amount = 1, stackSize = 1, maxStack = 20},
+            {itemID = 3371, name = "Empty Vial", amount = 1, stackSize = 5, maxStack = 20}
+        }
+    },
+    {
+        name = "Instant Poison VI",
         itemID = 8928,
         icon = "Interface\\Icons\\ability_poisons",
         materials = {
@@ -35,13 +64,48 @@ local POISONS = {
         }
     },
     {
-        name = "Corrosive Poison II",
-        itemID = 47409,
-        icon = "Interface\\Icons\\inv_corrosive_01",
+        name = "Instant Poison V",
+        itemID = 8927,
+        icon = "Interface\\Icons\\ability_poisons",
         materials = {
             {itemID = 8924, name = "Dust of Deterioration", amount = 3, stackSize = 1, maxStack = 20},
-            {itemID = 5173, name = "Deathweed", amount = 3, stackSize = 1, maxStack = 20},
             {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5, maxStack = 20}
+        }
+    },
+    {
+        name = "Instant Poison IV",
+        itemID = 8926,
+        icon = "Interface\\Icons\\ability_poisons",
+        materials = {
+            {itemID = 8924, name = "Dust of Deterioration", amount = 2, stackSize = 1, maxStack = 20},
+            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5, maxStack = 20}
+        }
+    },
+    {
+        name = "Instant Poison III",
+        itemID = 6950,
+        icon = "Interface\\Icons\\ability_poisons",
+        materials = {
+            {itemID = 8924, name = "Dust of Deterioration", amount = 1, stackSize = 1, maxStack = 20},
+            {itemID = 3372, name = "Leaded Vial", amount = 1, stackSize = 5, maxStack = 20}
+        }
+    },
+    {
+        name = "Instant Poison II",
+        itemID = 6949,
+        icon = "Interface\\Icons\\ability_poisons",
+        materials = {
+            {itemID = 2928, name = "Dust of Decay", amount = 3, stackSize = 1, maxStack = 20},
+            {itemID = 3372, name = "Leaded Vial", amount = 1, stackSize = 5, maxStack = 20}
+        }
+    },
+    {
+        name = "Instant Poison I",
+        itemID = 6947,
+        icon = "Interface\\Icons\\ability_poisons",
+        materials = {
+            {itemID = 2928, name = "Dust of Decay", amount = 1, stackSize = 1, maxStack = 20},
+            {itemID = 3371, name = "Empty Vial", amount = 1, stackSize = 5, maxStack = 20}
         }
     },
     {
@@ -54,6 +118,91 @@ local POISONS = {
         }
     },
     {
+        name = "Deadly Poison IV",
+        itemID = 8985,
+        icon = "Interface\\Icons\\ability_rogue_dualweild",
+        materials = {
+            {itemID = 5173, name = "Deathweed", amount = 5, stackSize = 1, maxStack = 20},
+            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5, maxStack = 20}
+        }
+    },
+    {
+        name = "Deadly Poison III",
+        itemID = 8984,
+        icon = "Interface\\Icons\\ability_rogue_dualweild",
+        materials = {
+            {itemID = 5173, name = "Deathweed", amount = 3, stackSize = 1, maxStack = 20},
+            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5, maxStack = 20}
+        }
+    },
+    {
+        name = "Deadly Poison II",
+        itemID = 2893,
+        icon = "Interface\\Icons\\ability_rogue_dualweild",
+        materials = {
+            {itemID = 5173, name = "Deathweed", amount = 2, stackSize = 1, maxStack = 20},
+            {itemID = 3372, name = "Leaded Vial", amount = 1, stackSize = 5, maxStack = 20}
+        }
+    },
+    {
+        name = "Deadly Poison I",
+        itemID = 2892,
+        icon = "Interface\\Icons\\ability_rogue_dualweild",
+        materials = {
+            {itemID = 5173, name = "Deathweed", amount = 1, stackSize = 1, maxStack = 20},
+            {itemID = 3372, name = "Leaded Vial", amount = 1, stackSize = 5, maxStack = 20}
+        }
+    },
+    {
+        name = "Wound Poison IV",
+        itemID = 10922,
+        icon = "Interface\\Icons\\INV_Misc_Herb_16",
+        materials = {
+            {itemID = 5173, name = "Deathweed", amount = 2, stackSize = 1, maxStack = 20},
+            {itemID = 8923, name = "Essence of Agony", amount = 2, stackSize = 1, maxStack = 20},
+            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5, maxStack = 20}
+        }
+    },
+    {
+        name = "Wound Poison III",
+        itemID = 10921,
+        icon = "Interface\\Icons\\INV_Misc_Herb_16",
+        materials = {
+            {itemID = 5173, name = "Deathweed", amount = 2, stackSize = 1, maxStack = 20},
+            {itemID = 8923, name = "Essence of Agony", amount = 1, stackSize = 1, maxStack = 20},
+            {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5, maxStack = 20}
+        }
+    },
+    {
+        name = "Wound Poison II",
+        itemID = 10920,
+        icon = "Interface\\Icons\\INV_Misc_Herb_16",
+        materials = {
+            {itemID = 5173, name = "Deathweed", amount = 2, stackSize = 1, maxStack = 20},
+            {itemID = 2930, name = "Essence of Pain", amount = 1, stackSize = 1, maxStack = 20},
+            {itemID = 3372, name = "Leaded Vial", amount = 1, stackSize = 5, maxStack = 20}
+        }
+    },
+    {
+        name = "Wound Poison I",
+        itemID = 10918,
+        icon = "Interface\\Icons\\INV_Misc_Herb_16",
+        materials = {
+            {itemID = 5173, name = "Deathweed", amount = 1, stackSize = 1, maxStack = 20},
+            {itemID = 2930, name = "Essence of Pain", amount = 1, stackSize = 1, maxStack = 20},
+            {itemID = 3372, name = "Leaded Vial", amount = 1, stackSize = 5, maxStack = 20}
+        }
+    },
+    {
+        name = "Agitating Poison",
+        itemID = 65032,
+        icon = "Interface\\Icons\\Spell_Nature_SlowPoison",
+        materials = {
+            {itemID = 2931, name = "Maiden's Anguish", amount = 2, stackSize = 1, maxStack = 10},
+            {itemID = 3372, name = "Leaded Vial", amount = 1, stackSize = 5, maxStack = 20}
+        }
+    },
+    {
         name = "Mind-numbing Poison III",
         itemID = 9186,
         icon = "Interface\\Icons\\spell_nature_nullifydisease",
@@ -61,6 +210,26 @@ local POISONS = {
             {itemID = 8924, name = "Dust of Deterioration", amount = 2, stackSize = 1, maxStack = 20},
             {itemID = 8923, name = "Essence of Agony", amount = 2, stackSize = 1, maxStack = 20},
             {itemID = 8925, name = "Crystal Vial", amount = 1, stackSize = 5, maxStack = 20}
+        }
+    },
+    {
+        name = "Mind-numbing Poison II",
+        itemID = 6951,
+        icon = "Interface\\Icons\\spell_nature_nullifydisease",
+        materials = {
+            {itemID = 2928, name = "Dust of Decay", amount = 4, stackSize = 1, maxStack = 20},
+            {itemID = 2930, name = "Essence of Pain", amount = 4, stackSize = 1, maxStack = 20},
+            {itemID = 3372, name = "Leaded Vial", amount = 1, stackSize = 5, maxStack = 20}
+        }
+    },
+    {
+        name = "Mind-numbing Poison II",
+        itemID = 5237,
+        icon = "Interface\\Icons\\spell_nature_nullifydisease",
+        materials = {
+            {itemID = 2928, name = "Dust of Decay", amount = 1, stackSize = 1, maxStack = 20},
+            {itemID = 2930, name = "Essence of Pain", amount = 1, stackSize = 1, maxStack = 20},
+            {itemID = 3371, name = "Empty Vial", amount = 1, stackSize = 5, maxStack = 20}
         }
     }
 }
@@ -449,7 +618,7 @@ function EasyPoisons:CreateMainFrame()
 
     mainFrame = CreateFrame("Frame", "EasyPoisonsFrame", UIParent)
     mainFrame:SetWidth(300)
-    mainFrame:SetHeight(260)
+    mainFrame:SetHeight(690)
     mainFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
     mainFrame:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
